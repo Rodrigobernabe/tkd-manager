@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Alumno {
+  id              String   @id @default(cuid())
+  nombre          String
+  dni             String   @unique
+  fechaNacimiento DateTime
+  direccion       String
+  estadoSeguro    Boolean  @default(false)
+  fichaMedica     String   @default("Pendiente")
+  notas           String?
+  sede            String   @default("Sede Principal")
+  montoCuota      Float    @default(0)
+  activo          Boolean  @default(true)
+  graduacion      String   @default("Cinturón Blanco")
+
+  cuotas          Cuota[]
+  inscripciones   InscripcionEvento[]
+  recaudaciones   RecaudacionFondo[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Cuota {
+  id        String   @id @default(cuid())
+  alumnoId  String
+  alumno    Alumno   @relation(fields: [alumnoId], references: [id], onDelete: Cascade)
+  mes       Int      // 1-12
+  anio      Int
+  monto     Float
+  fechaPago DateTime @default(now())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([alumnoId, mes, anio])
+}
+
+model Producto {
+  id            String   @id @default(cuid())
+  descripcion   String
+  cantidad      Int      @default(0)
+  precioCosto   Float    @default(0)
+  precioVenta   Float    @default(0)
+  linkProveedor String?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Evento {
+  id            String   @id @default(cuid())
+  nombre        String
+  fecha         DateTime
+  tipo          String   // "Torneo" o "Examen"
+
+  inscripciones InscripcionEvento[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model InscripcionEvento {
+  id               String   @id @default(cuid())
+  eventoId         String
+  evento           Evento   @relation(fields: [eventoId], references: [id], onDelete: Cascade)
+  alumnoId         String
+  alumno           Alumno   @relation(fields: [alumnoId], references: [id], onDelete: Cascade)
+  edadActual       Int
+  graduacion       String
+  categoriaFormas  String
+  categoriaCombate String
+  // Campos de pago según tipo de evento
+  pagoExamen       Boolean  @default(false)
+  pagoCinturon     Boolean  @default(false)
+  pagoTorneo       Boolean  @default(false)
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@unique([eventoId, alumnoId])
+}
+
+model RecaudacionFondo {
+  id          String   @id @default(cuid())
+  colaborador String
+  actividad   String
+  aporte      Float
+  fecha       DateTime @default(now())
+  // Asociación opcional con un alumno (para identificar de qué familia viene el aporte)
+  alumnoId    String?
+  alumno      Alumno?  @relation(fields: [alumnoId], references: [id], onDelete: SetNull)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
