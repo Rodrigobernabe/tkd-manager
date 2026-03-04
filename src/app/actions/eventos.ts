@@ -24,11 +24,10 @@ export async function inscribirAlumno(formData: FormData) {
                 categoriaCombate
             }
         })
-        revalidatePath(`/eventos/${eventoId}`)
-        return { success: true }
     } catch (error) {
-        return { success: false, error: 'Hubo un error o el alumno ya está inscripto.' }
+        // maneja error
     }
+    revalidatePath(`/eventos/${eventoId}`)
 }
 
 export async function eliminarInscripcion(id: string, eventoId: string) {
