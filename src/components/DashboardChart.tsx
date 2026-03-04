@@ -40,7 +40,7 @@ export function DashboardChart({ data }: DashboardChartProps) {
                     cursor={{ fill: '#27272a', opacity: 0.4 }}
                     contentStyle={{ backgroundColor: '#09090b', borderColor: '#27272a', color: '#f4f4f5', borderRadius: '8px' }}
                     itemStyle={{ color: '#f97316' }}
-                    formatter={(value: number) => [`$${value.toLocaleString('es-AR')}`, 'Ingresos']}
+                    formatter={(value: any) => [`$${value.toLocaleString('es-AR')}`, 'Ingresos']}
                 />
                 <Bar
                     dataKey="ingresos"
